@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postavke-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postavke
+  template:
+    metadata:
+      labels:
+        app: postavke
+    spec:
+      containers:
+        - image: ts4894/postavke:2021-12-21-23-54-34
+          name: postavke
+          env:
+            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
+              value: jdbc:postgresql://postavke-db.postgres.database.azure.com:5432/postgres?user=postgresAdmin&sslmode=require
+            - name: KUMULUZEE_DATASOURCES0_USERNAME
+              value: postgresAdmin
+            - name: KUMULUZEE_DATASOURCES0_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-pas-postavke
+                  key: password
+          ports:
+            - containerPort: 8084
+              name: server
+              protocol: TCP
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postavke
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8084
+      protocol: TCP
+      targetPort: server
+  selector:
+    app: postavke

@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: proxy-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2 #/image-catalog/v1/images
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /igrisca(/|$)(.*)
+            backend:
+              serviceName: igrisca
+              servicePort: 8083
+          - path: /postavke(/|$)(.*)
+            backend:
+              serviceName: postavke
+              servicePort: 8081
+#          - path: /comments(/|$)(.*)
+#            backend:
+#              serviceName: comments
+#              servicePort: 8081
+
+#kubectl get ingress

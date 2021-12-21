@@ -1,0 +1,1 @@
+INSERT INTO postavke_metadata (uporabnikID, pay) VALUES (111111, 15.12);

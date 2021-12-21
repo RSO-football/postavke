@@ -1,0 +1,34 @@
+kumuluzee:
+  name: postavke-service
+  env:
+    name: dev
+  version: 1.0.0
+  server:
+    base-url: http://localhost:8084
+    http:
+      port: 8084
+  datasources:
+    - jndi-name: jdbc/PostavkeMetadataDS
+      connection-url: jdbc:postgresql://postavke-db.postgres.database.azure.com:5432/postgres?user=postgresAdmin&password=&sslmode=require
+      username: postgresAdmin
+  health:
+    checks:
+      data-source-health-check:
+        type: liveness
+        jndi-name: jdbc/PostavkeMetadataDS
+    metrics:
+      web-instrumentation:
+        - name: postavke-endpoint
+          url-pattern: /v1/postavke/*
+  rest-client:
+    registrations:
+      - class: postavke-processing-api
+        url: http://localhost:8084/v1
+        read-timeout: 5000
+rest-properties:
+  maintenance-mode: false
+  broken: false
+app-properties:
+  amazon-rekognition:
+    access-key:
+    secret-key:
