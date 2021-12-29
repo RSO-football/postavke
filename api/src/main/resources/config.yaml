@@ -9,7 +9,7 @@ kumuluzee:
       port: 8084
   datasources:
     - jndi-name: jdbc/PostavkeMetadataDS
-      connection-url: jdbc:postgresql://postavke-db.postgres.database.azure.com:5432/postgres?user=postgresAdmin&password=&sslmode=require
+      connection-url: jdbc:postgresql://postavke-db.postgres.database.azure.com:5432/postgres?user=postgresAdmin&password=CustomDBPass123&sslmode=require
       username: postgresAdmin
   health:
     checks:
@@ -32,3 +32,8 @@ app-properties:
   amazon-rekognition:
     access-key:
     secret-key:
+
+rezervacije-storitev:
+  url: "http://localhost:8082"
+  enabled: false
+  watch: true

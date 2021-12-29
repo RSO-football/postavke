@@ -50,7 +50,6 @@ public class PostavkeMetadataResource {
 
     @POST
     public Response createPostavkeMetadata(PostavkeMetadata postavkeMetadata) {
-
         if ((postavkeMetadata.getUporabnikID() == null || new Float(postavkeMetadata.getPay()) == null)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }

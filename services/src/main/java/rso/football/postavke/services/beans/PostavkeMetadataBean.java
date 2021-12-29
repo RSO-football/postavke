@@ -1,18 +1,27 @@
 package rso.football.postavke.services.beans;
 
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
 import rso.football.postavke.lib.PostavkeMetadata;
 import rso.football.postavke.models.converters.PostavkeMetadataConverter;
 import rso.football.postavke.models.entities.PostavkeMetadataEntity;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -24,6 +33,18 @@ public class PostavkeMetadataBean {
 
     @Inject
     private EntityManager em;
+
+    private Client httpClient;
+    private String baseUrlRezervacije;
+
+    @PostConstruct
+    private void init() {
+        String uniqueID = UUID.randomUUID().toString();
+        log.info("Inicializacija zrna: " + PostavkeMetadataBean.class.getSimpleName() + " id: " + uniqueID);
+
+        httpClient = ClientBuilder.newClient();
+        baseUrlRezervacije = ConfigurationUtil.getInstance().get("rezervacije-storitev-url").orElse("http://localhost:8082/");
+    }
 
     public List<PostavkeMetadata> getPostavkeMetadata() {
 
@@ -61,6 +82,12 @@ public class PostavkeMetadataBean {
     public PostavkeMetadata createPostavkeMetadata(PostavkeMetadata postavkeMetadata) {
 
         PostavkeMetadataEntity postavkeMetadataEntity = PostavkeMetadataConverter.toEntity(postavkeMetadata);
+        log.info(postavkeMetadataEntity.getUporabnikID().toString());
+
+        Integer trenerRezervacije = Integer.parseInt(getTrenerRezervacije(postavkeMetadataEntity.getUporabnikID()));
+        log.info("Trener " + postavkeMetadataEntity.getUporabnikID() + " ima " + Integer.toString(trenerRezervacije) + "rezervacij");
+        Float pay = trenerRezervacije * (float) 100.0;
+        postavkeMetadataEntity.setPay(pay);
 
         try {
             beginTx();
@@ -120,6 +147,19 @@ public class PostavkeMetadataBean {
         }
 
         return true;
+    }
+
+    public String getTrenerRezervacije(Integer trenerId){
+        String url = baseUrlRezervacije + "v1/rezervacije/trener/" + trenerId;
+        log.info("url je " + url);
+
+        try {
+            return httpClient
+                    .target(url)
+                    .request().get(String.class);
+        } catch (WebApplicationException | ProcessingException e){
+            throw new InternalServerErrorException(e);
+        }
     }
 
     private void beginTx() {
