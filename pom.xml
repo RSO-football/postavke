@@ -21,6 +21,7 @@
 
         <kumuluzee.version>3.12.2</kumuluzee.version>
         <kumuluzee-rest.version>1.5.1</kumuluzee-rest.version>
+        <kumuluzee-cors.version>1.0.4</kumuluzee-cors.version>
 
 
         <postgresql.version>42.3.0</postgresql.version>
@@ -40,6 +41,12 @@
                 <groupId>com.kumuluz.ee.rest</groupId>
                 <artifactId>kumuluzee-rest-core</artifactId>
                 <version>${kumuluzee-rest.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.kumuluz.ee.cors</groupId>
+                <artifactId>kumuluzee-cors</artifactId>
+                <version>${kumuluzee-cors.version}</version>
             </dependency>
 
 

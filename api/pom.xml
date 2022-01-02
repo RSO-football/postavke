@@ -21,6 +21,11 @@
             <artifactId>kumuluzee-servlet-jetty</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.kumuluz.ee.cors</groupId>
+            <artifactId>kumuluzee-cors</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>rso.football</groupId>

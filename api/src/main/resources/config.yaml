@@ -3,6 +3,11 @@ kumuluzee:
   env:
     name: dev
   version: 1.0.0
+  cors-filter:
+    annotations:
+      my-resource:
+        allow-origin: "http://kumuluz.com"
+        allow-subdomains: false
   server:
     base-url: http://localhost:8084
     http:

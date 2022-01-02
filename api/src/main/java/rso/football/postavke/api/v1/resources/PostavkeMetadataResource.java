@@ -1,5 +1,6 @@
 package rso.football.postavke.api.v1.resources;
 
+import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import rso.football.postavke.lib.PostavkeMetadata;
 import rso.football.postavke.services.beans.PostavkeMetadataBean;
 
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 @Path("/postavke")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@CrossOrigin(supportedMethods = "GET, POST, DELETE, PUT, HEAD, OPTIONS")
 public class PostavkeMetadataResource {
 
     private Logger log = Logger.getLogger(PostavkeMetadataResource.class.getName());
