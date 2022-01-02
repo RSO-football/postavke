@@ -37,3 +37,8 @@ rezervacije-storitev:
   url: "http://localhost:8082"
   enabled: false
   watch: true
+
+rekviziti-storitev:
+  url: "http://localhost:8085"
+  enabled: false
+  watch: true

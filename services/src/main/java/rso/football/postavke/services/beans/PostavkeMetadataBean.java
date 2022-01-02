@@ -4,6 +4,7 @@ import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
 import rso.football.postavke.lib.PostavkeMetadata;
+import rso.football.postavke.lib.RekvizitiMetadata;
 import rso.football.postavke.models.converters.PostavkeMetadataConverter;
 import rso.football.postavke.models.entities.PostavkeMetadataEntity;
 
@@ -20,6 +21,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -36,6 +38,7 @@ public class PostavkeMetadataBean {
 
     private Client httpClient;
     private String baseUrlRezervacije;
+    private String baseUrlRekviziti;
 
     @PostConstruct
     private void init() {
@@ -44,6 +47,7 @@ public class PostavkeMetadataBean {
 
         httpClient = ClientBuilder.newClient();
         baseUrlRezervacije = ConfigurationUtil.getInstance().get("rezervacije-storitev-url").orElse("http://localhost:8082/");
+        baseUrlRekviziti = ConfigurationUtil.getInstance().get("rekviziti-storitev-url").orElse("http://localhost:8085/");
     }
 
     public List<PostavkeMetadata> getPostavkeMetadata() {
@@ -87,6 +91,11 @@ public class PostavkeMetadataBean {
         Integer trenerRezervacije = Integer.parseInt(getTrenerRezervacije(postavkeMetadataEntity.getUporabnikID()));
         log.info("Trener " + postavkeMetadataEntity.getUporabnikID() + " ima " + Integer.toString(trenerRezervacije) + "rezervacij");
         Float pay = trenerRezervacije * (float) 100.0;
+
+        // informacije o prodanih rekvizitih
+        Integer rekvizitiCost = getSkupnaCenaRekviziti();
+        pay += rekvizitiCost * (float) 0.1;
+
         postavkeMetadataEntity.setPay(pay);
 
         try {
@@ -147,6 +156,20 @@ public class PostavkeMetadataBean {
         }
 
         return true;
+    }
+
+    public Integer getSkupnaCenaRekviziti(){
+        String url = baseUrlRekviziti + "v1/rekviziti/skupna";
+        log.info("url je " + url);
+
+        try {
+            return httpClient
+                    .target(url)
+                    .request().get(Integer.class);
+        } catch (WebApplicationException | ProcessingException e){
+            throw new InternalServerErrorException(e);
+        }
+
     }
 
     public String getTrenerRezervacije(Integer trenerId){
