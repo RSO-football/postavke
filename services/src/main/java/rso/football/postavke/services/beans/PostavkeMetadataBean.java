@@ -46,8 +46,8 @@ public class PostavkeMetadataBean {
         log.info("Inicializacija zrna: " + PostavkeMetadataBean.class.getSimpleName() + " id: " + uniqueID);
 
         httpClient = ClientBuilder.newClient();
-        baseUrlRezervacije = ConfigurationUtil.getInstance().get("rezervacije-storitev-url").orElse("http://localhost:8082/");
-        baseUrlRekviziti = ConfigurationUtil.getInstance().get("rekviziti-storitev-url").orElse("http://localhost:8085/");
+        baseUrlRezervacije = ConfigurationUtil.getInstance().get("rezervacije-storitev.url").orElse("http://localhost:8082/");
+        baseUrlRekviziti = ConfigurationUtil.getInstance().get("rekviziti-storitev.url").orElse("http://localhost:8085/");
     }
 
     public List<PostavkeMetadata> getPostavkeMetadata() {
