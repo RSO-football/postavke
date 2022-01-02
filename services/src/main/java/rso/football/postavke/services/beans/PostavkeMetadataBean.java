@@ -66,8 +66,22 @@ public class PostavkeMetadataBean {
         QueryParameters queryParameters = QueryParameters.query(uriInfo.getRequestUri().getQuery()).defaultOffset(0)
                 .build();
 
-        return JPAUtils.queryEntities(em, PostavkeMetadataEntity.class, queryParameters).stream()
+        String trenerId = uriInfo.getQueryParameters().getFirst("trenerId");
+
+        List<PostavkeMetadata> results = JPAUtils.queryEntities(em, PostavkeMetadataEntity.class, queryParameters).stream()
                 .map(PostavkeMetadataConverter::toDto).collect(Collectors.toList());
+
+        if (trenerId != null){
+            List<PostavkeMetadata> newResults = new ArrayList<>();
+            for (PostavkeMetadata postavka : results){
+                if (postavka.getUporabnikID() == Integer.parseInt(trenerId)){
+                    newResults.add(postavka);
+                }
+            }
+            return newResults;
+        }
+
+        return results;
     }
 
     public PostavkeMetadata getPostavkeMetadata(Integer id) {
@@ -93,7 +107,7 @@ public class PostavkeMetadataBean {
         Float pay = trenerRezervacije * (float) 100.0;
 
         // informacije o prodanih rekvizitih
-        Integer rekvizitiCost = getSkupnaCenaRekviziti();
+        Integer rekvizitiCost = getCenaRekvizitiTrenerja(postavkeMetadataEntity.getUporabnikID());
         pay += rekvizitiCost * (float) 0.1;
 
         postavkeMetadataEntity.setPay(pay);
@@ -158,8 +172,8 @@ public class PostavkeMetadataBean {
         return true;
     }
 
-    public Integer getSkupnaCenaRekviziti(){
-        String url = baseUrlRekviziti + "v1/rekviziti/skupna";
+    public Integer getCenaRekvizitiTrenerja(Integer trenerId){
+        String url = baseUrlRekviziti + "v1/rekviziti/cena/" + trenerId;
         log.info("url je " + url);
 
         try {
