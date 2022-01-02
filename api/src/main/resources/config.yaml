@@ -34,11 +34,11 @@ app-properties:
     secret-key:
 
 rezervacije-storitev:
-  url: "http://localhost:8082/"
+  url: "http://52.151.211.52:8082/"
   enabled: false
   watch: true
 
 rekviziti-storitev:
-  url: "http://localhost:8085/"
+  url: "http://20.88.176.138:8085/"
   enabled: false
   watch: true
