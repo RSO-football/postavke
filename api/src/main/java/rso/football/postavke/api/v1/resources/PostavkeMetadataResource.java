@@ -88,9 +88,9 @@ public class PostavkeMetadataResource {
     public Response putPostavkeMetadata(@PathParam("postavkeMetadataId") Integer postavkeMetadataId,
                                      PostavkeMetadata postavkeMetadata) {
 
-        if (postavkeMetadata.getUporabnikID() != null && postavkeMetadataBean.existsPostavakaTrenerja(postavkeMetadata.getUporabnikID())){
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+//        if (postavkeMetadata.getUporabnikID() != null && postavkeMetadataBean.existsPostavakaTrenerja(postavkeMetadata.getUporabnikID())){
+//            return Response.status(Response.Status.BAD_REQUEST).build();
+//        }
 
         postavkeMetadata = postavkeMetadataBean.putPostavkeMetadata(postavkeMetadataId, postavkeMetadata);
 
