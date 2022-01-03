@@ -88,6 +88,16 @@ public class PostavkeMetadataBean {
         return results;
     }
 
+    public boolean existsPostavakaTrenerja(Integer uporabnikID) {
+        List<PostavkeMetadata> postavkeMetadata = getPostavkeMetadata();
+        for (PostavkeMetadata p : postavkeMetadata){
+            if (p.getUporabnikID() == uporabnikID){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public PostavkeMetadata getPostavkeMetadataByTrenerId(Integer trenerId){
         TypedQuery<PostavkeMetadataEntity> query = em.createNamedQuery(
                 "PostavkeMetadataEntity.getAllTrenerId", PostavkeMetadataEntity.class);
@@ -141,6 +151,13 @@ public class PostavkeMetadataBean {
     public PostavkeMetadata createPostavkeMetadata(PostavkeMetadata postavkeMetadata) {
 
         PostavkeMetadataEntity postavkeMetadataEntity = PostavkeMetadataConverter.toEntity(postavkeMetadata);
+
+        String trenerjiString = getTrenerjiId();
+        List<Integer> trenerjiId = Arrays.stream(trenerjiString.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+
+        if (trenerjiId.contains(postavkeMetadataEntity.getUporabnikID())){
+            return null;
+        }
 //        log.info(postavkeMetadataEntity.getUporabnikID().toString());
 //
 //        Integer trenerRezervacije = Integer.parseInt(getTrenerRezervacije(postavkeMetadataEntity.getUporabnikID()));

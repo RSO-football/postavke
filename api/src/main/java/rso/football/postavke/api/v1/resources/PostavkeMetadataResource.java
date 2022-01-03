@@ -70,10 +70,16 @@ public class PostavkeMetadataResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         else {
+            if (postavkeMetadataBean.existsPostavakaTrenerja(postavkeMetadata.getUporabnikID())){
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
             postavkeMetadata = postavkeMetadataBean.createPostavkeMetadata(postavkeMetadata);
+            if (postavkeMetadata == null){
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
         }
 
-        return Response.status(Response.Status.CONFLICT).entity(postavkeMetadata).build();
+        return Response.status(Response.Status.CREATED).entity(postavkeMetadata).build();
 
     }
 
@@ -82,13 +88,17 @@ public class PostavkeMetadataResource {
     public Response putPostavkeMetadata(@PathParam("postavkeMetadataId") Integer postavkeMetadataId,
                                      PostavkeMetadata postavkeMetadata) {
 
+        if (postavkeMetadata.getUporabnikID() != null && postavkeMetadataBean.existsPostavakaTrenerja(postavkeMetadata.getUporabnikID())){
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         postavkeMetadata = postavkeMetadataBean.putPostavkeMetadata(postavkeMetadataId, postavkeMetadata);
 
         if (postavkeMetadata == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        return Response.status(Response.Status.NOT_MODIFIED).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
 
     }
 
