@@ -8,7 +8,9 @@ import java.time.Instant;
 @NamedQueries(value =
         {
                 @NamedQuery(name = "PostavkeMetadataEntity.getAll",
-                        query = "SELECT im FROM PostavkeMetadataEntity im")
+                        query = "SELECT im FROM PostavkeMetadataEntity im"),
+                @NamedQuery(name = "PostavkeMetadataEntity.getAllTrenerId",
+                        query = "SELECT p FROM PostavkeMetadataEntity p WHERE p.uporabnikID = ?1")
         })
 public class PostavkeMetadataEntity {
 

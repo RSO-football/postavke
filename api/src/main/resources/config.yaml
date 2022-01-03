@@ -47,3 +47,8 @@ rekviziti-storitev:
   url: "http://20.88.176.138:8085/"
   enabled: false
   watch: true
+
+uporabniki-storitev:
+  url: "http://20.85.248.6:8083/"
+  enabled: false
+  watch: true

@@ -1,6 +1,7 @@
 package rso.football.postavke.api.v1.resources;
 
 import com.kumuluz.ee.cors.annotations.CrossOrigin;
+import rso.football.postavke.lib.PlaceMetadata;
 import rso.football.postavke.lib.PostavkeMetadata;
 import rso.football.postavke.services.beans.PostavkeMetadataBean;
 
@@ -48,6 +49,19 @@ public class PostavkeMetadataResource {
         }
 
         return Response.status(Response.Status.OK).entity(postavkeMetadata).build();
+    }
+
+    @GET
+    @Path("/place")
+    public Response getPlaceMetadata() {
+
+        List<PlaceMetadata> placeMetadata = postavkeMetadataBean.getPlaceMetadata();
+
+        if (placeMetadata == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.status(Response.Status.OK).entity(placeMetadata).build();
     }
 
     @POST

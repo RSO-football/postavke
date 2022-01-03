@@ -3,6 +3,7 @@ package rso.football.postavke.services.beans;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import rso.football.postavke.lib.PlaceMetadata;
 import rso.football.postavke.lib.PostavkeMetadata;
 import rso.football.postavke.lib.RekvizitiMetadata;
 import rso.football.postavke.models.converters.PostavkeMetadataConverter;
@@ -22,6 +23,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -39,6 +41,7 @@ public class PostavkeMetadataBean {
     private Client httpClient;
     private String baseUrlRezervacije;
     private String baseUrlRekviziti;
+    private String baseUrlUporabniki;
 
     @PostConstruct
     private void init() {
@@ -48,6 +51,7 @@ public class PostavkeMetadataBean {
         httpClient = ClientBuilder.newClient();
         baseUrlRezervacije = ConfigurationUtil.getInstance().get("rezervacije-storitev.url").orElse("http://localhost:8082/");
         baseUrlRekviziti = ConfigurationUtil.getInstance().get("rekviziti-storitev.url").orElse("http://localhost:8085/");
+        baseUrlUporabniki = ConfigurationUtil.getInstance().get("uporabniki-storitev.url").orElse("http://localhost:8083/");
     }
 
     public List<PostavkeMetadata> getPostavkeMetadata() {
@@ -84,6 +88,19 @@ public class PostavkeMetadataBean {
         return results;
     }
 
+    public PostavkeMetadata getPostavkeMetadataByTrenerId(Integer trenerId){
+        TypedQuery<PostavkeMetadataEntity> query = em.createNamedQuery(
+                "PostavkeMetadataEntity.getAllTrenerId", PostavkeMetadataEntity.class);
+        query.setParameter(1, trenerId);
+
+        List<PostavkeMetadata> results = query.getResultList().stream().map(PostavkeMetadataConverter::toDto).collect(Collectors.toList());
+
+        if (results.size() > 0){
+            return results.get(0);
+        }
+        return null;
+    }
+
     public PostavkeMetadata getPostavkeMetadata(Integer id) {
 
         PostavkeMetadataEntity postavkeMetadataEntity = em.find(PostavkeMetadataEntity.class, id);
@@ -97,20 +114,44 @@ public class PostavkeMetadataBean {
         return postavkeMetadata;
     }
 
+    public List<PlaceMetadata> getPlaceMetadata() {
+        String trenerjiString = getTrenerjiId();
+        List<Integer> trenerjiId = Arrays.stream(trenerjiString.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+
+        List<PlaceMetadata> place = new ArrayList<>();
+
+        for (Integer trenerId : trenerjiId){
+            double salary = 0.0;
+            Integer trenerRezervacije = Integer.parseInt(getTrenerRezervacije(trenerId));
+            log.info("Trener " + trenerId + " ima " + Integer.toString(trenerRezervacije) + "rezervacij");
+            PostavkeMetadata postavkaTrenerja = getPostavkeMetadataByTrenerId(trenerId);
+            if (postavkaTrenerja != null){
+                salary = postavkaTrenerja.getPay() * trenerRezervacije;
+            }
+
+            Integer rekvizitiCost = getCenaRekvizitiTrenerja(trenerId);
+            salary += rekvizitiCost * 0.1;
+
+            place.add(new PlaceMetadata(trenerId, salary));
+        }
+
+        return place;
+    }
+
     public PostavkeMetadata createPostavkeMetadata(PostavkeMetadata postavkeMetadata) {
 
         PostavkeMetadataEntity postavkeMetadataEntity = PostavkeMetadataConverter.toEntity(postavkeMetadata);
-        log.info(postavkeMetadataEntity.getUporabnikID().toString());
-
-        Integer trenerRezervacije = Integer.parseInt(getTrenerRezervacije(postavkeMetadataEntity.getUporabnikID()));
-        log.info("Trener " + postavkeMetadataEntity.getUporabnikID() + " ima " + Integer.toString(trenerRezervacije) + "rezervacij");
-        Float pay = trenerRezervacije * (float) 100.0;
-
-        // informacije o prodanih rekvizitih
-        Integer rekvizitiCost = getCenaRekvizitiTrenerja(postavkeMetadataEntity.getUporabnikID());
-        pay += rekvizitiCost * (float) 0.1;
-
-        postavkeMetadataEntity.setPay(pay);
+//        log.info(postavkeMetadataEntity.getUporabnikID().toString());
+//
+//        Integer trenerRezervacije = Integer.parseInt(getTrenerRezervacije(postavkeMetadataEntity.getUporabnikID()));
+//        log.info("Trener " + postavkeMetadataEntity.getUporabnikID() + " ima " + Integer.toString(trenerRezervacije) + "rezervacij");
+//        Float pay = trenerRezervacije * (float) 100.0;
+//
+//        // informacije o prodanih rekvizitih
+//        Integer rekvizitiCost = getCenaRekvizitiTrenerja(postavkeMetadataEntity.getUporabnikID());
+//        pay += rekvizitiCost * (float) 0.1;
+//
+//        postavkeMetadataEntity.setPay(pay);
 
         try {
             beginTx();
@@ -188,6 +229,19 @@ public class PostavkeMetadataBean {
 
     public String getTrenerRezervacije(Integer trenerId){
         String url = baseUrlRezervacije + "v1/rezervacije/trener/" + trenerId;
+        log.info("url je " + url);
+
+        try {
+            return httpClient
+                    .target(url)
+                    .request().get(String.class);
+        } catch (WebApplicationException | ProcessingException e){
+            throw new InternalServerErrorException(e);
+        }
+    }
+
+    public String getTrenerjiId(){
+        String url = baseUrlUporabniki + "v1/uporabniki/trenerjiId";
         log.info("url je " + url);
 
         try {
