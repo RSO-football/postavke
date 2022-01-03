@@ -155,7 +155,9 @@ public class PostavkeMetadataBean {
         String trenerjiString = getTrenerjiId();
         List<Integer> trenerjiId = Arrays.stream(trenerjiString.split(",")).map(Integer::parseInt).collect(Collectors.toList());
 
-        if (trenerjiId.contains(postavkeMetadataEntity.getUporabnikID())){
+        System.out.println(trenerjiString);
+
+        if (!trenerjiId.contains(postavkeMetadataEntity.getUporabnikID())){
             return null;
         }
 //        log.info(postavkeMetadataEntity.getUporabnikID().toString());
