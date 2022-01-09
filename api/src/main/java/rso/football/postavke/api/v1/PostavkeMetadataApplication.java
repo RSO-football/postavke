@@ -15,7 +15,7 @@ import javax.ws.rs.core.Application;
 @OpenAPIDefinition(info = @Info(title = "Postavke API", version = "v1",
         contact = @Contact(email = "rb2600@student.uni-lj.si"),
         license = @License(name = "dev"), description = "API for managing postavke metadata."),
-        servers = @Server(url = "http://localhost:8084/"))
+        servers = @Server(url = "http://52.151.221.150:8084/"))
 @ApplicationPath("/v1")
 public class PostavkeMetadataApplication extends Application {
 
