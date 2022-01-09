@@ -3,11 +3,13 @@ package rso.football.postavke.services.beans;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import rso.football.postavke.lib.PlaceMetadata;
 import rso.football.postavke.lib.PostavkeMetadata;
 import rso.football.postavke.lib.RekvizitiMetadata;
 import rso.football.postavke.models.converters.PostavkeMetadataConverter;
 import rso.football.postavke.models.entities.PostavkeMetadataEntity;
+import rso.football.postavke.services.clients.UporabnikiApi;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
@@ -37,6 +39,10 @@ public class PostavkeMetadataBean {
 
     @Inject
     private EntityManager em;
+
+    @Inject
+    @RestClient
+    private UporabnikiApi uporabnikiApi;
 
     private Client httpClient;
     private String baseUrlRezervacije;
@@ -125,7 +131,10 @@ public class PostavkeMetadataBean {
     }
 
     public List<PlaceMetadata> getPlaceMetadata() {
-        String trenerjiString = getTrenerjiId();
+        // async rest call
+        String trenerjiString = uporabnikiApi.getTrenerjiId();
+        System.out.println(trenerjiString);
+//        String trenerjiString = getTrenerjiId();
         List<Integer> trenerjiId = Arrays.stream(trenerjiString.split(",")).map(Integer::parseInt).collect(Collectors.toList());
 
         List<PlaceMetadata> place = new ArrayList<>();

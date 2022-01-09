@@ -27,8 +27,8 @@ kumuluzee:
           url-pattern: /v1/postavke/*
   rest-client:
     registrations:
-      - class: postavke-processing-api
-        url: http://localhost:8084/v1
+      - class: uporabniki-api
+        url: http://20.85.248.6:8083/v1
         read-timeout: 5000
 rest-properties:
   maintenance-mode: false
