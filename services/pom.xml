@@ -54,6 +54,11 @@
             <artifactId>kumuluzee-graphql-ui</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.kumuluz.ee.fault.tolerance</groupId>
+            <artifactId>kumuluzee-fault-tolerance-smallrye</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.json</groupId>
