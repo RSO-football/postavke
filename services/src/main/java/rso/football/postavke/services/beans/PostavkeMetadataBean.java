@@ -131,10 +131,10 @@ public class PostavkeMetadataBean {
     }
 
     public List<PlaceMetadata> getPlaceMetadata() {
-        // async rest call
-        String trenerjiString = uporabnikiApi.getTrenerjiId();
-        System.out.println(trenerjiString);
-//        String trenerjiString = getTrenerjiId();
+//        // async rest call
+//        String trenerjiString = uporabnikiApi.getTrenerjiId();
+//        System.out.println(trenerjiString);
+        String trenerjiString = getTrenerjiId();
         List<Integer> trenerjiId = Arrays.stream(trenerjiString.split(",")).map(Integer::parseInt).collect(Collectors.toList());
 
         List<PlaceMetadata> place = new ArrayList<>();
