@@ -3,6 +3,9 @@ package rso.football.postavke.services.beans;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import rso.football.postavke.lib.PlaceMetadata;
 import rso.football.postavke.lib.PostavkeMetadata;
@@ -24,6 +27,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriInfo;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -148,6 +152,7 @@ public class PostavkeMetadataBean {
                 salary = postavkaTrenerja.getPay() * trenerRezervacije;
             }
 
+            System.out.println("FT begin");
             Integer rekvizitiCost = getCenaRekvizitiTrenerja(trenerId);
             salary += rekvizitiCost * 0.1;
 
@@ -241,8 +246,12 @@ public class PostavkeMetadataBean {
         return true;
     }
 
+    @Timeout(value = 5, unit = ChronoUnit.SECONDS)
+    @CircuitBreaker(requestVolumeThreshold = 1)
+    @Fallback(fallbackMethod = "getCenaRekvizitiTrenerjaFallback")
     public Integer getCenaRekvizitiTrenerja(Integer trenerId){
         String url = baseUrlRekviziti + "v1/rekviziti/cena/" + trenerId;
+        System.out.println("url je " + url);
         log.info("url je " + url);
 
         try {
@@ -250,9 +259,14 @@ public class PostavkeMetadataBean {
                     .target(url)
                     .request().get(Integer.class);
         } catch (WebApplicationException | ProcessingException e){
+            log.severe(e.getMessage());
             throw new InternalServerErrorException(e);
         }
+    }
 
+    public Integer getCenaRekvizitiTrenerjaFallback(Integer trenerId){
+        System.out.println("Fault tolerance fallback");
+        return 0;
     }
 
     public String getTrenerRezervacije(Integer trenerId){

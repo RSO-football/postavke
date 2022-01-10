@@ -13,7 +13,7 @@ spec:
         app: postavke
     spec:
       containers:
-        - image: ts4894/postavke:2022-01-09-20-20-16
+        - image: ts4894/postavke:2022-01-10-19-20-32
           name: postavke
           env:
             - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
