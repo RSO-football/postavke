@@ -138,7 +138,9 @@ public class PostavkeMetadataBean {
 //        // async rest call
 //        String trenerjiString = uporabnikiApi.getTrenerjiId();
 //        System.out.println(trenerjiString);
+        System.out.println("Zacetek plac");
         String trenerjiString = getTrenerjiId();
+        System.out.println("Dobili trenerje");
         List<Integer> trenerjiId = Arrays.stream(trenerjiString.split(",")).map(Integer::parseInt).collect(Collectors.toList());
 
         List<PlaceMetadata> place = new ArrayList<>();
@@ -158,6 +160,8 @@ public class PostavkeMetadataBean {
 
             place.add(new PlaceMetadata(trenerId, salary));
         }
+
+        System.out.println("Konec plac");
 
         return place;
     }
@@ -246,9 +250,9 @@ public class PostavkeMetadataBean {
         return true;
     }
 
-    @Timeout(value = 5, unit = ChronoUnit.SECONDS)
-    @CircuitBreaker(requestVolumeThreshold = 1)
-    @Fallback(fallbackMethod = "getCenaRekvizitiTrenerjaFallback")
+//    @Timeout(value = 5, unit = ChronoUnit.SECONDS)
+//    @CircuitBreaker(requestVolumeThreshold = 1)
+//    @Fallback(fallbackMethod = "getCenaRekvizitiTrenerjaFallback")
     public Integer getCenaRekvizitiTrenerja(Integer trenerId){
         String url = baseUrlRekviziti + "v1/rekviziti/cena/" + trenerId;
         System.out.println("url je " + url);
@@ -259,15 +263,15 @@ public class PostavkeMetadataBean {
                     .target(url)
                     .request().get(Integer.class);
         } catch (WebApplicationException | ProcessingException e){
-            log.severe(e.getMessage());
+//            log.severe(e.getMessage());
             throw new InternalServerErrorException(e);
         }
     }
 
-    public Integer getCenaRekvizitiTrenerjaFallback(Integer trenerId){
-        System.out.println("Fault tolerance fallback");
-        return 0;
-    }
+//    public Integer getCenaRekvizitiTrenerjaFallback(Integer trenerId){
+//        System.out.println("Fault tolerance fallback");
+//        return 0;
+//    }
 
     public String getTrenerRezervacije(Integer trenerId){
         String url = baseUrlRezervacije + "v1/rezervacije/trener/" + trenerId;

@@ -59,6 +59,11 @@
             <artifactId>kumuluzee-fault-tolerance-smallrye</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.kumuluz.ee.streaming</groupId>
+            <artifactId>kumuluzee-streaming-kafka</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.json</groupId>
